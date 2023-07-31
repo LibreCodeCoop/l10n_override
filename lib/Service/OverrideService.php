@@ -15,6 +15,8 @@ class OverrideService {
 	private string $serverRoot;
 	private array $rootL10nFiles;
 	private Text $text;
+	/** @var Text[] */
+	private array $toOverride = [];
 	private array $translations = [];
 	public function __construct(
 		private IAppManager $appManager,
@@ -24,15 +26,51 @@ class OverrideService {
 		$this->text = new Text();
 	}
 
-	public function add(string $theme, string $appid, string $originalText, string $newText, string $newLanguage): void {
-		$this->parseAddArguments($theme, $appid, $originalText, $newText, $newLanguage);
+	public function add(string $theme, string $appId, string $originalText, string $newText, string $newLanguage): void {
+		$this->parseTheme($theme)
+			->parseAppId($appId)
+			->parseNewLanguage($newLanguage)
+			->parseOriginalText($originalText);
+		$this->text->setNewText($newText);
 		$this->textMapper->insertOrUpdate($this->text);
-		$this->updateInMemory();
-		$this->writeJsonFile();
-		$this->writeJsFile();
+		$this->updateFiles();
 	}
 
-	private function writeJsonFile(): void {
+	public function delete(string $theme, string $appId, string $originalText, string $newLanguage): void {
+		$this->parseTheme($theme)
+			->parseAppId($appId)
+			->parseNewLanguage($newLanguage)
+			->parseOriginalText($originalText);
+		$this->textMapper->delete($this->text);
+		$this->updateFiles();
+	}
+
+	private function updateFiles(): void {
+		$this->updateInMemory();
+		if (!count($this->toOverride)) {
+			$this->removeFiles();
+			return;
+		}
+		$this->updateJsonFile();
+		$this->updateJsFile();
+	}
+
+	private function removeFiles(): void {
+		if (!file_exists($this->rootL10nFiles['newFiles']['js'])) {
+			return;
+		}
+		$file = $this->rootL10nFiles['newFiles']['js'];
+		exec('rm -rf ' . escapeshellarg($file));
+		$file = $this->rootL10nFiles['newFiles']['json'];
+		exec('rm -rf ' . escapeshellarg($file));
+		$dir = dirname($file);
+		while (!(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
+			exec('rm -rf ' . escapeshellarg($dir));
+			$dir = dirname($dir);
+		}
+	}
+
+	private function updateJsonFile(): void {
 		$content = "{ \"translations\": {\n    ";
 		$texts = [];
 		foreach ($this->translations['translations'] as $id => $val) {
@@ -46,7 +84,7 @@ class OverrideService {
 		$this->write('json', $content);
 	}
 
-	private function writeJsFile() {
+	private function updateJsFile() {
 		$content = "OC.L10N.register(\n    \"{$this->appId}\",\n    {\n    ";
 		$texts = [];
 		foreach ($this->translations['translations'] as $id => $val) {
@@ -70,18 +108,10 @@ class OverrideService {
 	}
 
 	public function updateInMemory(): void {
-		$toOverride = $this->textMapper->getRelatedTranslations($this->text);
-		foreach ($toOverride as $text) {
+		$this->toOverride = $this->textMapper->getRelatedTranslations($this->text);
+		foreach ($this->toOverride as $text) {
 			$this->translations['translations'][$text->getOriginalText()] = $text->getNewText();
 		}
-	}
-
-	private function parseAddArguments(string $theme, string $appId, string $originalText, string $newText, string $newLanguage): void {
-		$this->parseTheme($theme)
-			->parseAppId($appId)
-			->parseNewLanguage($newLanguage)
-			->parseOriginalText($originalText);
-		$this->text->setNewText($newText);
 	}
 
 	private function parseTheme(string $theme): self {

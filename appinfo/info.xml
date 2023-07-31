@@ -23,5 +23,6 @@
 	</dependencies>
 	<commands>
 		<command>OCA\L10nOverride\Command\Add</command>
+		<command>OCA\L10nOverride\Command\Delete</command>
 	</commands>
 </info>

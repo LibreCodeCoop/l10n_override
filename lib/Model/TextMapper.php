@@ -19,6 +19,16 @@ class TextMapper extends QBMapper {
 	}
 
 	public function insertOrUpdate(Entity $entity): Entity {
+		$entity = $this->getIdOfEntity($entity);
+		return parent::insertOrUpdate($entity);
+	}
+
+	public function delete(Entity $entity): Entity {
+		$entity = $this->getIdOfEntity($entity);
+		return parent::delete($entity);
+	}
+
+	private function getIdOfEntity(Entity $entity): Entity {
 		if (!$entity->getId()) {
 			$qb = $this->db->getQueryBuilder();
 			$qb->select('id')
@@ -32,7 +42,7 @@ class TextMapper extends QBMapper {
 				$entity->setId($id);
 			}
 		}
-		return parent::insertOrUpdate($entity);
+		return $entity;
 	}
 
 	/**
