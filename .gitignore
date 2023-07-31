@@ -1,0 +1,14 @@
+# PHP
+/vendor
+/vendor-bin/*/vendor
+/lib/Vendor
+/.php-cs-fixer.cache
+.phpunit.result.cache
+
+# PHPStorm
+.idea
+*.iml
+
+# VScode settings
+.vscode
+*.code-workspace

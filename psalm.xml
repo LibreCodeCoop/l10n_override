@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<psalm
+	findUnusedCode="false"
+	errorBaseline="tests/psalm-baseline.xml"
+	errorLevel="5"
+	findUnusedBaselineEntry="true"
+	resolveFromConfigFile="true"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="https://getpsalm.org/schema/config"
+	xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+>
+	<projectFiles>
+		<directory name="lib" />
+		<ignoreFiles>
+			<directory name="vendor" />
+		</ignoreFiles>
+	</projectFiles>
+	<issueHandlers>
+		<UndefinedClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Doctrine\DBAL\Types\Types" />
+				<referencedClass name="OC" />
+				<referencedClass name="OC\*" />
+			</errorLevel>
+		</UndefinedClass>
+		<UndefinedDocblockClass>
+			<errorLevel type="suppress">
+				<referencedClass name="Doctrine\DBAL\Schema\Table" />
+				<referencedClass name="OC\*" />
+			</errorLevel>
+		</UndefinedDocblockClass>
+	</issueHandlers>
+</psalm>
