@@ -108,7 +108,7 @@ class OverrideService {
 		file_put_contents($this->rootL10nFiles['newFiles'][$format], $content);
 	}
 
-	public function updateInMemory(): void {
+	private function updateInMemory(): void {
 		$this->toOverride = $this->textMapper->getRelatedTranslations($this->text);
 		foreach ($this->toOverride as $text) {
 			$this->translations['translations'][$text->getOriginalText()] = $text->getNewText();
