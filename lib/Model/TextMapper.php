@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace OCA\L10nOverride\Model;
+namespace OCA\L10n\Model;
 
 use OCP\AppFramework\Db\Entity;
 use OCP\AppFramework\Db\QBMapper;
@@ -13,7 +13,7 @@ use OCP\IDBConnection;
  * @template-extends QBMapper<Text>
  */
 class TextMapper extends QBMapper {
-	public const TABLE_NAME = 'l10n_override_text';
+	public const TABLE_NAME = 'l10n_text';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, self::TABLE_NAME);

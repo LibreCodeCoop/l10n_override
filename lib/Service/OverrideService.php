@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\L10nOverride\Service;
+namespace OCA\L10n\Service;
 
 use InvalidArgumentException;
-use OCA\L10nOverride\Model\Text;
-use OCA\L10nOverride\Model\TextMapper;
+use OCA\L10n\Model\Text;
+use OCA\L10n\Model\TextMapper;
 use OCP\App\AppPathNotFoundException;
 use OCP\App\IAppManager;
 use OCP\Files\NotFoundException;
