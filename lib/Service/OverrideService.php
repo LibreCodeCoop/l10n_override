@@ -81,14 +81,14 @@ class OverrideService {
 	}
 
 	private function removeFiles(): void {
-		if (!file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json')) {
-			return;
+		if (file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json')) {
+			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.js';
+			exec('rm -rf ' . escapeshellarg($file));
+			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json';
+			exec('rm -rf ' . escapeshellarg($file));
 		}
-		$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.js';
-		exec('rm -rf ' . escapeshellarg($file));
-		$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json';
-		exec('rm -rf ' . escapeshellarg($file));
-		$dir = dirname($file);
+		$dir = $this->getThemeL10nFolder();
+		// Remove empty folders
 		while (!(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
 			exec('rm -rf ' . escapeshellarg($dir));
 			$dir = dirname($dir);
