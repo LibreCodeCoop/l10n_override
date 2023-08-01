@@ -60,6 +60,7 @@ class Version1000Date20230731165751 extends SimpleMigrationStep {
 				'notnull' => false,
 				'length' => 64,
 			]);
+			// necessary to be used at unique key
 			$table->addColumn('original_text_md5', Types::STRING, [
 				'notnull' => false,
 				'length' => 32,
