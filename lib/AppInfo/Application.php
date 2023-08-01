@@ -15,7 +15,7 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
  * @codeCoverageIgnore
  */
 class Application extends App implements IBootstrap {
-	public const APP_ID = 'l10n_override';
+	public const APP_ID = 'l10n';
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);

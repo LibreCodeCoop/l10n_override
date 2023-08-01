@@ -22,7 +22,7 @@ class Delete extends Base {
 
 	protected function configure(): void {
 		$this
-			->setName('l10n:delete')
+			->setName('l10n-override:delete')
 			->setDescription('Remove overwritten translation.')
 			->addArgument('theme',
 				InputArgument::REQUIRED,

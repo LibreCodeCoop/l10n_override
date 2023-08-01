@@ -22,7 +22,7 @@ class Add extends Base {
 
 	protected function configure(): void {
 		$this
-			->setName('l10n:add')
+			->setName('l10n-override:add')
 			->setDescription('Override a translation text')
 			->addArgument('theme',
 				InputArgument::REQUIRED,

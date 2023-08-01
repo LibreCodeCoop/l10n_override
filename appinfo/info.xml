@@ -7,8 +7,8 @@
 Available commands:
 
 ```
-occ l10n:add
-occ l10n:delete
+occ l10n-override:add
+occ l10n-override:delete
 ```
 
 💡 Do you have an app idea? Want customizations to an existing app? Contact our sales team: contact@librecode.coop
@@ -19,14 +19,14 @@ occ l10n:delete
 	<licence>agpl</licence>
 	<author mail="contact@librecode.coop" homepage="https://librecode.coop">LibreCode</author>
 	<documentation>
-		<admin>https://github.com/librecodecoop/l10n_override/blob/master/README.md</admin>
+		<admin>https://github.com/librecodecoop/l10n/blob/master/README.md</admin>
 	</documentation>
 	<category>organization</category>
 	<category>tools</category>
-	<website>https://github.com/librecodecoop/l10n_override</website>
+	<website>https://github.com/librecodecoop/l10n</website>
 	<discussion>https://t.me/librecodecoop</discussion>
-	<bugs>https://github.com/librecodecoop/l10n_override/issues</bugs>
-	<repository type="git">https://github.com/librecodecoop/l10n_override</repository>
+	<bugs>https://github.com/librecodecoop/l10n/issues</bugs>
+	<repository type="git">https://github.com/librecodecoop/l10n</repository>
 	<dependencies>
 		<nextcloud min-version="27" max-version="28"/>
 	</dependencies>

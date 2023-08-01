@@ -13,7 +13,7 @@ use OCP\IDBConnection;
  * @template-extends QBMapper<Text>
  */
 class TextMapper extends QBMapper {
-	public const TABLE_NAME = 'l10n_override_text';
+	public const TABLE_NAME = 'l10n_text';
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, self::TABLE_NAME);
