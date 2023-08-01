@@ -47,6 +47,8 @@ use OCP\DB\Types;
  * @method string getNewText()
  * @method void setNewLanguage()
  * @method string getNewLanguage()
+ * @method void setNotFound()
+ * @method int getNotFound()
  */
 class Text extends Entity {
 	/** @var int */
@@ -63,6 +65,8 @@ class Text extends Entity {
 	public $newText;
 	/** @var string */
 	public $newLanguage;
+	/** @var int */
+	public $notFound;
 
 	public function __construct() {
 		$this->addType('id', Types::STRING);
@@ -71,6 +75,7 @@ class Text extends Entity {
 		$this->addType('original_text', Types::STRING);
 		$this->addType('new_text', Types::STRING);
 		$this->addType('new_language', Types::STRING);
+		$this->addType('not_found', Types::SMALLINT);
 	}
 
 	public function setOriginalText(string $originalText): void {

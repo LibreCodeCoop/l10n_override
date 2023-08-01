@@ -75,6 +75,11 @@ class Version1000Date20230731165751 extends SimpleMigrationStep {
 				'notnull' => false,
 				'length' => 10,
 			]);
+			$table->addColumn('not_found', Types::SMALLINT, [
+				'notnull' => false,
+				'default' => 0,
+				'unsigned' => true,
+			]);
 			$table->setPrimaryKey(['id']);
 			$table->addUniqueIndex(['theme', 'app', 'original_text_md5'], 'unique_key');
 		}
