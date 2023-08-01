@@ -15,7 +15,6 @@ class OverrideService {
 	private string $themeFolder;
 	private string $appId;
 	private string $serverRoot;
-	private array $rootL10nFiles;
 	private Text $text;
 	/** @var Text[] */
 	private array $toOverride = [];
@@ -82,12 +81,12 @@ class OverrideService {
 	}
 
 	private function removeFiles(): void {
-		if (!file_exists($this->rootL10nFiles['newFiles']['js'])) {
+		if (!file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json')) {
 			return;
 		}
-		$file = $this->rootL10nFiles['newFiles']['js'];
+		$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.js';
 		exec('rm -rf ' . escapeshellarg($file));
-		$file = $this->rootL10nFiles['newFiles']['json'];
+		$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json';
 		exec('rm -rf ' . escapeshellarg($file));
 		$dir = dirname($file);
 		while (!(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
@@ -125,12 +124,11 @@ class OverrideService {
 	}
 
 	private function write(string $format, string $content): void {
-		$path = dirname($this->rootL10nFiles['newFiles'][$format]);
-		if (!is_dir($path)) {
-			exec('mkdir -p ' . escapeshellarg($path));
+		if (!is_dir($this->getThemeL10nFolder())) {
+			exec('mkdir -p ' . escapeshellarg($this->getThemeL10nFolder()));
 		}
-		exec('mkdir -p ' . escapeshellarg($path));
-		file_put_contents($this->rootL10nFiles['newFiles'][$format], $content);
+		$fileName = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $format;
+		file_put_contents($fileName, $content);
 	}
 
 	private function updateInMemory(): void {
@@ -187,18 +185,8 @@ class OverrideService {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.json'));
 		}
 		$this->text->setNewLanguage($newLanguage);
-		$this->rootL10nFiles = [
-			'originalFiles' => [
-				'js' => $rootL10nPath . '.js',
-				'json' => $rootL10nPath . '.json',
-			],
-			'newFiles' => [
-				'js' => $this->getThemeL10nFolder() . $newLanguage . '.js',
-				'json' => $this->getThemeL10nFolder() . $newLanguage . '.json',
-			],
-		];
 
-		$jsonContent = file_get_contents($this->rootL10nFiles['originalFiles']['json']);
+		$jsonContent = file_get_contents($rootL10nPath . '.json');
 		$this->translations = json_decode($jsonContent, true);
 
 		return $this;
