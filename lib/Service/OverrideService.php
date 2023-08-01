@@ -7,6 +7,7 @@ namespace OCA\L10nOverride\Service;
 use InvalidArgumentException;
 use OCA\L10nOverride\Model\Text;
 use OCA\L10nOverride\Model\TextMapper;
+use OCP\App\AppPathNotFoundException;
 use OCP\App\IAppManager;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
@@ -15,7 +16,6 @@ class OverrideService {
 	private string $themeFolder;
 	private string $appId;
 	private string $serverRoot;
-	private array $rootL10nFiles;
 	private Text $text;
 	/** @var Text[] */
 	private array $toOverride = [];
@@ -50,25 +50,28 @@ class OverrideService {
 		$this->updateFiles();
 	}
 
-	public function update(string $theme, string $appId, string $newLanguage): void {
-		try {
-			$this->parseTheme($theme)
-				->parseAppId($appId)
-				->parseNewLanguage($newLanguage);
-		} catch (NotFoundException $e) {
-			$this->notifyNotFoundAllTexts($theme, $appId, $newLanguage);
-		}
+	public function deleteAllLanguages(string $appId): void {
+		$this->parseTheme();
+		$this->parseAppId($appId);
 		$this->updateFiles();
 	}
 
 	public function updateAllLanguages(string $appId): void {
-		if (!$theme = $this->config->getSystemValue('theme')) {
-			return;
-		}
-		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($theme, $appId);
+		$this->parseTheme();
+		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($this->text->getTheme(), $appId);
 		foreach ($languages as $language) {
-			$this->update($theme, $appId, $language);
+			$this->update($this->text->getTheme(), $appId, $language);
 		}
+	}
+
+	private function update(string $appId, string $newLanguage): void {
+		try {
+			$this->parseAppId($appId)
+				->parseNewLanguage($newLanguage);
+		} catch (NotFoundException $e) {
+			$this->notifyNotFoundAllTexts($appId, $newLanguage);
+		}
+		$this->updateFiles();
 	}
 
 	private function updateFiles(): void {
@@ -82,14 +85,14 @@ class OverrideService {
 	}
 
 	private function removeFiles(): void {
-		if (!file_exists($this->rootL10nFiles['newFiles']['js'])) {
-			return;
+		if (file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json')) {
+			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.js';
+			exec('rm -rf ' . escapeshellarg($file));
+			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json';
+			exec('rm -rf ' . escapeshellarg($file));
 		}
-		$file = $this->rootL10nFiles['newFiles']['js'];
-		exec('rm -rf ' . escapeshellarg($file));
-		$file = $this->rootL10nFiles['newFiles']['json'];
-		exec('rm -rf ' . escapeshellarg($file));
-		$dir = dirname($file);
+		$dir = $this->getThemeL10nFolder();
+		// Remove empty folders
 		while (!(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
 			exec('rm -rf ' . escapeshellarg($dir));
 			$dir = dirname($dir);
@@ -125,19 +128,18 @@ class OverrideService {
 	}
 
 	private function write(string $format, string $content): void {
-		$path = dirname($this->rootL10nFiles['newFiles'][$format]);
-		if (!is_dir($path)) {
-			exec('mkdir -p ' . escapeshellarg($path));
+		if (!is_dir($this->getThemeL10nFolder())) {
+			exec('mkdir -p ' . escapeshellarg($this->getThemeL10nFolder()));
 		}
-		exec('mkdir -p ' . escapeshellarg($path));
-		file_put_contents($this->rootL10nFiles['newFiles'][$format], $content);
+		$fileName = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $format;
+		file_put_contents($fileName, $content);
 	}
 
 	private function updateInMemory(): void {
 		$this->toOverride = $this->textMapper->getRelatedTranslations($this->text);
 		foreach ($this->toOverride as $key => $text) {
 			$originalText = $text->getOriginalText();
-			if (!isset($this->translations['translations'][$originalText])) {
+			if (empty($this->translations['translations'][$originalText])) {
 				$this->notifyNotFoundText($text);
 				unset($this->toOverride[$key]);
 				continue;
@@ -151,11 +153,16 @@ class OverrideService {
 		$this->textMapper->insertOrUpdate($textNotFound);
 	}
 
-	private function notifyNotFoundAllTexts(string $theme, string $appId, string $newLanguage): void {
-		$this->textMapper->flagAllAsDeleted($theme, $appId, $newLanguage);
+	private function notifyNotFoundAllTexts(string $appId, string $newLanguage): void {
+		$this->textMapper->flagAllAsDeleted($this->text->getTheme(), $appId, $newLanguage);
 	}
 
-	private function parseTheme(string $theme): self {
+	private function parseTheme(?string $theme = null): self {
+		if (!$theme) {
+			if (!$theme = $this->config->getSystemValue('theme')) {
+				return $this;
+			}
+		}
 		$theme = escapeshellcmd($theme);
 		if (!file_exists($this->serverRoot . '/themes/' . $theme)) {
 			mkdir($this->serverRoot . '/themes/' . $theme);
@@ -166,8 +173,12 @@ class OverrideService {
 	}
 
 	private function parseAppId(string $appId): self {
-		if (!in_array($appId, ['core', 'lib']) && !$this->appManager->isInstalled($appId)) {
-			throw new InvalidArgumentException(sprintf('Is necessary to have an app with id %s installed or use core or lib as appId', $appId));
+		if (!in_array($appId, ['core', 'lib'])) {
+			try {
+				$this->appManager->getAppPath($appId);
+			} catch (AppPathNotFoundException $e) {
+				throw new InvalidArgumentException(sprintf('Is necessary to have an app with id %s or use core or lib as appId', $appId));
+			}
 		}
 		$this->text->setApp($appId);
 		$this->appId = $appId;
@@ -177,10 +188,8 @@ class OverrideService {
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
 			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
-			$newPath = $this->themeFolder . '/apps/' . $this->appId . '/l10n/' . $newLanguage;
 		} else {
 			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
-			$newPath = $this->themeFolder . '/' . $this->appId . '/l10n/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -189,33 +198,25 @@ class OverrideService {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.json'));
 		}
 		$this->text->setNewLanguage($newLanguage);
-		$this->rootL10nFiles = [
-			'originalFiles' => [
-				'js' => $rootL10nPath . '.js',
-				'json' => $rootL10nPath . '.json',
-			],
-			'newFiles' => [
-				'js' => $newPath . '.js',
-				'json' => $newPath . '.json',
-			],
-		];
 
-		$jsonContent = file_get_contents($this->rootL10nFiles['originalFiles']['json']);
+		$jsonContent = file_get_contents($rootL10nPath . '.json');
 		$this->translations = json_decode($jsonContent, true);
 
 		return $this;
 	}
 
-	private function parseOriginalText(string $originalText): self {
-		if (!isset($this->translations['translations'])) {
-			throw new InvalidArgumentException(sprintf(
-				'Invalid translation file: %s. Property translation not found.', $this->rootL10nFiles['originalFiles']['json']
-			));
+	private function getThemeL10nFolder(): string {
+		if (in_array($this->appId, ['core', 'lib'])) {
+			return $this->themeFolder . '/' . $this->appId . '/l10n/';
 		}
+		return $this->themeFolder . '/apps/' . $this->appId . '/l10n/';
+	}
+
+	private function parseOriginalText(string $originalText): self {
 		if (!isset($this->translations['translations'][$originalText])) {
 			throw new InvalidArgumentException(sprintf(
-				"Text not found in originalText at file %s:\n%s",
-				$this->rootL10nFiles['originalFiles']['json'],
+				"Text not found in translations file of app %s:\n%s",
+				$this->appId,
 				$originalText
 			));
 		}
