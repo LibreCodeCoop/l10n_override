@@ -137,7 +137,7 @@ class OverrideService {
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
 			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
-			$newPath = str_replace($this->serverRoot, '', $rootL10nPath);
+			$newPath = $this->themeFolder . '/apps/' . $this->appId . '/l10n/' . $newLanguage;
 		} else {
 			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
 			$newPath = $this->themeFolder . '/' . $this->appId . '/l10n/' . $newLanguage;
