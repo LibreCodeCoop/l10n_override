@@ -177,10 +177,8 @@ class OverrideService {
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
 			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
-			$newPath = $this->themeFolder . '/apps/' . $this->appId . '/l10n/' . $newLanguage;
 		} else {
 			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
-			$newPath = $this->themeFolder . '/' . $this->appId . '/l10n/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -195,8 +193,8 @@ class OverrideService {
 				'json' => $rootL10nPath . '.json',
 			],
 			'newFiles' => [
-				'js' => $newPath . '.js',
-				'json' => $newPath . '.json',
+				'js' => $this->getThemeL10nFolder() . $newLanguage . '.js',
+				'json' => $this->getThemeL10nFolder() . $newLanguage . '.json',
 			],
 		];
 
@@ -206,16 +204,18 @@ class OverrideService {
 		return $this;
 	}
 
-	private function parseOriginalText(string $originalText): self {
-		if (!isset($this->translations['translations'])) {
-			throw new InvalidArgumentException(sprintf(
-				'Invalid translation file: %s. Property translation not found.', $this->rootL10nFiles['originalFiles']['json']
-			));
+	private function getThemeL10nFolder(): string {
+		if (in_array($this->appId, ['core', 'lib'])) {
+			return $this->themeFolder . '/' . $this->appId . '/l10n/';
 		}
+		return $this->themeFolder . '/apps/' . $this->appId . '/l10n/';
+	}
+
+	private function parseOriginalText(string $originalText): self {
 		if (!isset($this->translations['translations'][$originalText])) {
 			throw new InvalidArgumentException(sprintf(
-				"Text not found in originalText at file %s:\n%s",
-				$this->rootL10nFiles['originalFiles']['json'],
+				"Text not found in translations file of app %s:\n%s",
+				$this->appId,
 				$originalText
 			));
 		}
