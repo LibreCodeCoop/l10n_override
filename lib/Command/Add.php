@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\L10nOverride\Command;
+namespace OCA\L10n\Command;
 
 use InvalidArgumentException;
 use OC\Core\Command\Base;
-use OCA\L10nOverride\Service\OverrideService;
+use OCA\L10n\Service\OverrideService;
 use OCP\Files\NotFoundException;
 use Symfony\Component\Console\Exception\InvalidArgumentException as ConsoleExceptionInvalidArgument;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,7 +22,7 @@ class Add extends Base {
 
 	protected function configure(): void {
 		$this
-			->setName('l10n-override:add')
+			->setName('l10n:add')
 			->setDescription('Override a translation text')
 			->addArgument('theme',
 				InputArgument::REQUIRED,

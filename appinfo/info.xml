@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
-	<id>l10n_override</id>
+	<id>l10n</id>
 	<name>Override Translation</name>
 	<summary>Override app translation</summary>
 	<description><![CDATA[Override app translation
 Available commands:
 
 ```
-occ l10n-override:add
-occ l10n-override:delete
+occ l10n:add
+occ l10n:delete
 ```
 
 💡 Do you have an app idea? Want customizations to an existing app? Contact our sales team: contact@librecode.coop
@@ -18,7 +18,6 @@ occ l10n-override:delete
 	<version>0.0.1</version>
 	<licence>agpl</licence>
 	<author mail="contact@librecode.coop" homepage="https://librecode.coop">LibreCode</author>
-	<namespace>L10nOverride</namespace>
 	<documentation>
 		<admin>https://github.com/librecodecoop/l10n_override/blob/master/README.md</admin>
 	</documentation>
@@ -32,7 +31,7 @@ occ l10n-override:delete
 		<nextcloud min-version="27" max-version="28"/>
 	</dependencies>
 	<commands>
-		<command>OCA\L10nOverride\Command\Add</command>
-		<command>OCA\L10nOverride\Command\Delete</command>
+		<command>OCA\L10n\Command\Add</command>
+		<command>OCA\L10n\Command\Delete</command>
 	</commands>
 </info>

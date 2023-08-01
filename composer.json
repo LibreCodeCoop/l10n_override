@@ -49,7 +49,7 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"OCA\\L10nOverride\\": "lib/"
+			"OCA\\L10n\\": "lib/"
 		}
 	},
 	"autoload-dev": {
