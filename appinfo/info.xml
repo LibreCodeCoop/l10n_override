@@ -3,7 +3,17 @@
 	<id>l10n_override</id>
 	<name>Override Translation</name>
 	<summary>Override app translation</summary>
-	<description><![CDATA[Override app translation]]>
+	<description><![CDATA[Override app translation
+Available commands:
+
+```
+occ l10n-override:add
+occ l10n-override:delete
+```
+
+💡 Do you have an app idea? Want customizations to an existing app? Contact our sales team: contact@librecode.coop
+
+	]]>
 	</description>
 	<version>0.0.1</version>
 	<licence>agpl</licence>

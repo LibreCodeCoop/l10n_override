@@ -7,6 +7,7 @@ namespace OCA\L10nOverride\Command;
 use InvalidArgumentException;
 use OC\Core\Command\Base;
 use OCA\L10nOverride\Service\OverrideService;
+use OCP\Files\NotFoundException;
 use Symfony\Component\Console\Exception\InvalidArgumentException as ConsoleExceptionInvalidArgument;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,7 +57,7 @@ class Add extends Base {
 				(string) $input->getArgument('newText'),
 				(string) $input->getArgument('newLanguage'),
 			);
-		} catch (InvalidArgumentException $e) {
+		} catch (InvalidArgumentException | NotFoundException $e) {
 			// Convert to Symfony Console Exception to don't display the row number
 			throw new ConsoleExceptionInvalidArgument($e->getMessage());
 		}
