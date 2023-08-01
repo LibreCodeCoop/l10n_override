@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use OCA\L10nOverride\Model\Text;
 use OCA\L10nOverride\Model\TextMapper;
 use OCP\App\IAppManager;
+use OCP\Files\NotFoundException;
 
 class OverrideService {
 	private string $themeFolder;
@@ -142,10 +143,10 @@ class OverrideService {
 			$newPath = $this->themeFolder . '/' . $this->appId . '/l10n/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
-			throw new InvalidArgumentException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
+			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
 		}
 		if (!file_exists($rootL10nPath . '.json')) {
-			throw new InvalidArgumentException(sprintf('Translation file not found: %s', $rootL10nPath . '.json'));
+			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.json'));
 		}
 		$this->text->setNewLanguage($newLanguage);
 		$this->rootL10nFiles = [
