@@ -49,17 +49,6 @@ class OverrideService {
 		$this->updateFiles();
 	}
 
-	public function update(string $theme, string $appId, string $newLanguage): void {
-		try {
-			$this->parseTheme($theme)
-				->parseAppId($appId)
-				->parseNewLanguage($newLanguage);
-		} catch (NotFoundException $e) {
-			$this->notifyNotFoundAllTexts($theme, $appId, $newLanguage);
-		}
-		$this->updateFiles();
-	}
-
 	public function updateAllLanguages(string $appId): void {
 		if (!$theme = $this->config->getSystemValue('theme')) {
 			return;
@@ -68,6 +57,17 @@ class OverrideService {
 		foreach ($languages as $language) {
 			$this->update($theme, $appId, $language);
 		}
+	}
+
+	private function update(string $theme, string $appId, string $newLanguage): void {
+		try {
+			$this->parseTheme($theme)
+				->parseAppId($appId)
+				->parseNewLanguage($newLanguage);
+		} catch (NotFoundException $e) {
+			$this->notifyNotFoundAllTexts($theme, $appId, $newLanguage);
+		}
+		$this->updateFiles();
 	}
 
 	private function updateFiles(): void {
