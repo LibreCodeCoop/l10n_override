@@ -50,6 +50,12 @@ class OverrideService {
 		$this->updateFiles();
 	}
 
+	public function deleteAllLanguages(string $appId): void {
+		$this->parseTheme();
+		$this->parseAppId($appId);
+		$this->updateFiles();
+	}
+
 	public function updateAllLanguages(string $appId): void {
 		$this->parseTheme();
 		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($this->text->getTheme(), $appId);

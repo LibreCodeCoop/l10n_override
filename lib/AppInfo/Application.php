@@ -4,6 +4,7 @@ namespace OCA\L10nOverride\AppInfo;
 
 use OC;
 use OCA\L10nOverride\Service\OverrideService;
+use OCP\App\Events\AppDisableEvent;
 use OCP\App\Events\AppEnableEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -23,6 +24,7 @@ class Application extends App implements IBootstrap {
 	public function boot(IBootContext $context): void {
 		$event = OC::$server->getEventDispatcher();
 		$event->addListener(AppEnableEvent::class, [$this, 'onAppEnabled']);
+		$event->addListener(AppDisableEvent::class, [$this, 'onAppDisabled']);
 	}
 
 	public function register(IRegistrationContext $context): void {
@@ -32,5 +34,11 @@ class Application extends App implements IBootstrap {
 		/** @var OverrideService */
 		$overrideService = \OC::$server->get(OverrideService::class);
 		$overrideService->updateAllLanguages($event->getAppId());
+	}
+
+	public function onAppDisabled(AppDisableEvent $event): void {
+		/** @var OverrideService */
+		$overrideService = \OC::$server->get(OverrideService::class);
+		$overrideService->deleteAllLanguages($event->getAppId());
 	}
 }
