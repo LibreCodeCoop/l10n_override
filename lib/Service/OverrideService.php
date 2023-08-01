@@ -7,6 +7,7 @@ namespace OCA\L10nOverride\Service;
 use InvalidArgumentException;
 use OCA\L10nOverride\Model\Text;
 use OCA\L10nOverride\Model\TextMapper;
+use OCP\App\AppPathNotFoundException;
 use OCP\App\IAppManager;
 use OCP\Files\NotFoundException;
 use OCP\IConfig;
@@ -50,22 +51,19 @@ class OverrideService {
 	}
 
 	public function updateAllLanguages(string $appId): void {
-		if (!$theme = $this->config->getSystemValue('theme')) {
-			return;
-		}
-		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($theme, $appId);
+		$this->parseTheme();
+		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($this->text->getTheme(), $appId);
 		foreach ($languages as $language) {
-			$this->update($theme, $appId, $language);
+			$this->update($this->text->getTheme(), $appId, $language);
 		}
 	}
 
-	private function update(string $theme, string $appId, string $newLanguage): void {
+	private function update(string $appId, string $newLanguage): void {
 		try {
-			$this->parseTheme($theme)
-				->parseAppId($appId)
+			$this->parseAppId($appId)
 				->parseNewLanguage($newLanguage);
 		} catch (NotFoundException $e) {
-			$this->notifyNotFoundAllTexts($theme, $appId, $newLanguage);
+			$this->notifyNotFoundAllTexts($appId, $newLanguage);
 		}
 		$this->updateFiles();
 	}
@@ -135,7 +133,7 @@ class OverrideService {
 		$this->toOverride = $this->textMapper->getRelatedTranslations($this->text);
 		foreach ($this->toOverride as $key => $text) {
 			$originalText = $text->getOriginalText();
-			if (!isset($this->translations['translations'][$originalText])) {
+			if (empty($this->translations['translations'][$originalText])) {
 				$this->notifyNotFoundText($text);
 				unset($this->toOverride[$key]);
 				continue;
@@ -149,11 +147,16 @@ class OverrideService {
 		$this->textMapper->insertOrUpdate($textNotFound);
 	}
 
-	private function notifyNotFoundAllTexts(string $theme, string $appId, string $newLanguage): void {
-		$this->textMapper->flagAllAsDeleted($theme, $appId, $newLanguage);
+	private function notifyNotFoundAllTexts(string $appId, string $newLanguage): void {
+		$this->textMapper->flagAllAsDeleted($this->text->getTheme(), $appId, $newLanguage);
 	}
 
-	private function parseTheme(string $theme): self {
+	private function parseTheme(?string $theme = null): self {
+		if (!$theme) {
+			if (!$theme = $this->config->getSystemValue('theme')) {
+				return $this;
+			}
+		}
 		$theme = escapeshellcmd($theme);
 		if (!file_exists($this->serverRoot . '/themes/' . $theme)) {
 			mkdir($this->serverRoot . '/themes/' . $theme);
@@ -164,8 +167,12 @@ class OverrideService {
 	}
 
 	private function parseAppId(string $appId): self {
-		if (!in_array($appId, ['core', 'lib']) && !$this->appManager->isInstalled($appId)) {
-			throw new InvalidArgumentException(sprintf('Is necessary to have an app with id %s installed or use core or lib as appId', $appId));
+		if (!in_array($appId, ['core', 'lib'])) {
+			try {
+				$this->appManager->getAppPath($appId);
+			} catch (AppPathNotFoundException $e) {
+				throw new InvalidArgumentException(sprintf('Is necessary to have an app with id %s or use core or lib as appId', $appId));
+			}
 		}
 		$this->text->setApp($appId);
 		$this->appId = $appId;
