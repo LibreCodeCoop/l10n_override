@@ -1,9 +1,9 @@
 <?php
 
-namespace OCA\L10n\AppInfo;
+namespace OCA\L10nOverride\AppInfo;
 
 use OC;
-use OCA\L10n\Service\OverrideService;
+use OCA\L10nOverride\Service\OverrideService;
 use OCP\App\Events\AppDisableEvent;
 use OCP\App\Events\AppEnableEvent;
 use OCP\AppFramework\App;
@@ -15,7 +15,7 @@ use OCP\AppFramework\Bootstrap\IRegistrationContext;
  * @codeCoverageIgnore
  */
 class Application extends App implements IBootstrap {
-	public const APP_ID = 'l10n';
+	public const APP_ID = 'l10n_override';
 
 	public function __construct() {
 		parent::__construct(self::APP_ID);

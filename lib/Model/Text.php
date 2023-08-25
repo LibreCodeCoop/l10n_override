@@ -23,7 +23,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\L10n\Model;
+namespace OCA\L10nOverride\Model;
 
 use OCP\AppFramework\Db\Entity;
 use OCP\DB\Types;
@@ -31,7 +31,7 @@ use OCP\DB\Types;
 /**
  * Class Texts
  *
- * @package OCA\L10n\Model
+ * @package OCA\L10nOverride\Model
  *
  * @method void setId()
  * @method int getId()

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace OCA\L10n\Service;
+namespace OCA\L10nOverride\Service;
 
 use InvalidArgumentException;
-use OCA\L10n\Model\Text;
-use OCA\L10n\Model\TextMapper;
+use OCA\L10nOverride\Model\Text;
+use OCA\L10nOverride\Model\TextMapper;
 use OCP\App\AppPathNotFoundException;
 use OCP\App\IAppManager;
 use OCP\Files\NotFoundException;
@@ -187,9 +187,9 @@ class OverrideService {
 
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
-			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
+			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n_override/' . $newLanguage;
 		} else {
-			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
+			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n_override/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -207,9 +207,9 @@ class OverrideService {
 
 	private function getThemeL10nFolder(): string {
 		if (in_array($this->appId, ['core', 'lib'])) {
-			return $this->themeFolder . '/' . $this->appId . '/l10n/';
+			return $this->themeFolder . '/' . $this->appId . '/l10n_override/';
 		}
-		return $this->themeFolder . '/apps/' . $this->appId . '/l10n/';
+		return $this->themeFolder . '/apps/' . $this->appId . '/l10n_override/';
 	}
 
 	private function parseOriginalText(string $originalText): self {
