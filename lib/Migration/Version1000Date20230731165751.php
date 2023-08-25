@@ -24,7 +24,7 @@ declare(strict_types=1);
  *
  */
 
-namespace OCA\L10n\Migration;
+namespace OCA\L10nOverride\Migration;
 
 use Closure;
 use Doctrine\DBAL\Types\Types;
