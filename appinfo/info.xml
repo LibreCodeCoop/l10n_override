@@ -4,10 +4,12 @@
 	<name>Override Translation</name>
 	<summary>Override app translation</summary>
 	<description><![CDATA[Override app translation
+
 Available commands:
 
 ```
 occ l10n-override:add
+occ l10n-override:list
 occ l10n-override:delete
 ```
 
@@ -29,7 +31,7 @@ occ l10n-override:delete
 	<bugs>https://github.com/librecodecoop/l10n_override/issues</bugs>
 	<repository type="git">https://github.com/librecodecoop/l10n_override</repository>
 	<dependencies>
-		<nextcloud min-version="27" max-version="28"/>
+		<nextcloud min-version="28" max-version="28"/>
 	</dependencies>
 	<commands>
 		<command>OCA\L10nOverride\Command\Add</command>
