@@ -4,10 +4,12 @@
 	<name>Override Translation</name>
 	<summary>Override app translation</summary>
 	<description><![CDATA[Override app translation
+
 Available commands:
 
 ```
 occ l10n-override:add
+occ l10n-override:list
 occ l10n-override:delete
 ```
 
