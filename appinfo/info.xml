@@ -18,7 +18,7 @@ occ l10n-override:delete
 	<version>0.0.1</version>
 	<licence>agpl</licence>
 	<author mail="contact@librecode.coop" homepage="https://librecode.coop">LibreCode</author>
-    <namespace>l10n_override</namespace>
+	<namespace>L10nOverride</namespace>
 	<documentation>
 		<admin>https://github.com/librecodecoop/l10n_override/blob/master/README.md</admin>
 	</documentation>
@@ -33,6 +33,7 @@ occ l10n-override:delete
 	</dependencies>
 	<commands>
 		<command>OCA\L10nOverride\Command\Add</command>
+		<command>OCA\L10nOverride\Command\ListTranslations</command>
 		<command>OCA\L10nOverride\Command\Delete</command>
 	</commands>
 </info>

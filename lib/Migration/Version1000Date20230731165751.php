@@ -45,8 +45,8 @@ class Version1000Date20230731165751 extends SimpleMigrationStep {
 	public function changeSchema(IOutput $output, Closure $schemaClosure, array $options): ?ISchemaWrapper {
 		/** @var ISchemaWrapper $schema */
 		$schema = $schemaClosure();
-		if (!$schema->hasTable('l10n_text')) {
-			$table = $schema->createTable('l10n_text');
+		if (!$schema->hasTable('l10n_override_text')) {
+			$table = $schema->createTable('l10n_override_text');
 			$table->addColumn('id', Types::BIGINT, [
 				'autoincrement' => true,
 				'notnull' => true,

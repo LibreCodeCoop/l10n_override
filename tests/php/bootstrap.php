@@ -1,11 +1,6 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * @copyright Copyright (c) 2023 Vitor Mattos <vitor@php.rio>
- *
- * @author Vitor Mattos <vitor@php.rio>
+ * @copyright Copyright (c) 2016 Lukas Reschke <lukas@statuscode.ch>
  *
  * @license GNU AGPL version 3 or any later version
  *
@@ -16,22 +11,21 @@ declare(strict_types=1);
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
  *
  * You should have received a copy of the GNU Affero General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-require_once './vendor/autoload.php';
-
-use Nextcloud\CodingStandard\Config;
-
-$config = new Config();
-$config
-	->getFinder()
-	->ignoreVCSIgnored(true)
-	->notPath('vendor')
-	->in(__DIR__);
-return $config;
+if (!defined('PHPUNIT_RUN')) {
+	define('PHPUNIT_RUN', 1);
+}
+require_once __DIR__.'/../../../../lib/base.php';
+\OC::$loader->addValidRoot(\OC::$SERVERROOT . '/tests');
+\OC_App::loadApp('my_company');
+if (!class_exists('\PHPUnit\Framework\TestCase')) {
+	require_once('PHPUnit/Autoload.php');
+}
+OC_Hook::clear();

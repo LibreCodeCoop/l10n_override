@@ -31,6 +31,7 @@ class OverrideService {
 	}
 
 	public function add(string $theme, string $appId, string $originalText, string $newText, string $newLanguage): void {
+		$this->text = new Text();
 		$this->parseTheme($theme)
 			->parseAppId($appId)
 			->parseNewLanguage($newLanguage)
@@ -41,7 +42,16 @@ class OverrideService {
 		$this->updateFiles();
 	}
 
+	public function list(string $theme = '', string $appId = '', string $language = ''): array {
+		return $this->textMapper->listLanguages(
+			theme: $theme,
+			appId: $appId,
+			language: $language,
+		);
+	}
+
 	public function delete(string $theme, string $appId, string $originalText, string $newLanguage): void {
+		$this->text = new Text();
 		$this->parseTheme($theme)
 			->parseAppId($appId)
 			->parseNewLanguage($newLanguage)
@@ -58,7 +68,10 @@ class OverrideService {
 
 	public function updateAllLanguages(string $appId): void {
 		$this->parseTheme();
-		$languages = $this->textMapper->getAllLanguagesOfThemeAndAp($this->text->getTheme(), $appId);
+		$languages = $this->textMapper->listLanguages(
+			theme: $this->text->getTheme(),
+			appId: $appId,
+		);
 		foreach ($languages as $language) {
 			$this->update($this->text->getTheme(), $appId, $language);
 		}
@@ -85,11 +98,12 @@ class OverrideService {
 	}
 
 	private function removeFiles(): void {
-		if (file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json')) {
-			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.js';
-			exec('rm -rf ' . escapeshellarg($file));
-			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.json';
-			exec('rm -rf ' . escapeshellarg($file));
+		$extensions = ['js', 'json'];
+		foreach ($extensions as $extension) {
+			if (file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $extension)) {
+				$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $extension;
+				exec('rm -rf ' . escapeshellarg($file));
+			}
 		}
 		$dir = $this->getThemeL10nFolder();
 		// Remove empty folders
@@ -187,9 +201,9 @@ class OverrideService {
 
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
-			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n_override/' . $newLanguage;
+			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
 		} else {
-			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n_override/' . $newLanguage;
+			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -207,9 +221,9 @@ class OverrideService {
 
 	private function getThemeL10nFolder(): string {
 		if (in_array($this->appId, ['core', 'lib'])) {
-			return $this->themeFolder . '/' . $this->appId . '/l10n_override/';
+			return $this->themeFolder . '/' . $this->appId . '/l10n/';
 		}
-		return $this->themeFolder . '/apps/' . $this->appId . '/l10n_override/';
+		return $this->themeFolder . '/apps/' . $this->appId . '/l10n/';
 	}
 
 	private function parseOriginalText(string $originalText): self {
