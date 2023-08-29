@@ -55,19 +55,13 @@ appstore:
 	mkdir -p $(appstore_sign_dir)/$(app_name)
 	cp -r \
 		appinfo \
-		img \
-		js \
-		l10n \
 		lib \
-		templates \
 		vendor \
 		CHANGELOG.md \
 		LICENSE \
 		$(appstore_sign_dir)/$(app_name)
 
-	rm $(appstore_sign_dir)/$(app_name)/vendor/endroid/qr-code/assets/*
 	mkdir -p $(appstore_sign_dir)/$(app_name)/tests/fixtures
-	cp tests/fixtures/small_valid.pdf $(appstore_sign_dir)/$(app_name)/tests/fixtures
 
 	# Remove stray .htaccess files since they are filtered by Nextcloud
 	find $(appstore_sign_dir) -name .htaccess -exec rm {} \;
