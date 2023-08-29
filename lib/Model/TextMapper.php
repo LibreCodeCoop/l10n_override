@@ -61,16 +61,23 @@ class TextMapper extends QBMapper {
 		return $this->findEntities($qb);
 	}
 
-	public function getAllLanguagesOfThemeAndAp(string $theme, string $appId): array {
+	public function listLanguages(string $theme = '', string $appId = '', string $language = ''): array {
 		$qb = $this->db->getQueryBuilder();
-		$qb->select('t.new_language')
+		$qb->select('t.*')
 			->from(self::TABLE_NAME, 't')
-			->where($qb->expr()->eq('theme', $qb->createNamedParameter($theme)))
-			->andWhere($qb->expr()->eq('app', $qb->createNamedParameter($appId)))
-			->andWhere($qb->expr()->eq('not_found', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT)));
+			->where($qb->expr()->eq('not_found', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT)));
+		if (!empty($theme)) {
+			$qb->andWhere($qb->expr()->eq('theme', $qb->createNamedParameter($theme)));
+		}
+		if (!empty($appId)) {
+			$qb->andWhere($qb->expr()->eq('app', $qb->createNamedParameter($appId)));
+		}
+		if (!empty($language)) {
+			$qb->andWhere($qb->expr()->eq('new_language', $qb->createNamedParameter($language)));
+		}
 		$result = $qb->executeQuery();
 		$languages = [];
-		while ($language = $result->fetchOne()) {
+		while ($language = $result->fetch()) {
 			$languages[] = $language;
 		}
 		return $languages;

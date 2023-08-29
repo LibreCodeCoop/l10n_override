@@ -33,6 +33,7 @@ occ l10n-override:delete
 	</dependencies>
 	<commands>
 		<command>OCA\L10nOverride\Command\Add</command>
+		<command>OCA\L10nOverride\Command\ListTranslations</command>
 		<command>OCA\L10nOverride\Command\Delete</command>
 	</commands>
 </info>
