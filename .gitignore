@@ -2,6 +2,7 @@
 /vendor
 /vendor-bin/*/vendor
 /lib/Vendor
+/build
 /.php-cs-fixer.cache
 .phpunit.result.cache
 
