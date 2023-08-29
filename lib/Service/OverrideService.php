@@ -187,9 +187,9 @@ class OverrideService {
 
 	private function parseNewLanguage(string $newLanguage): self {
 		if ($this->appManager->isInstalled($this->appId)) {
-			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n_override/' . $newLanguage;
+			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
 		} else {
-			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n_override/' . $newLanguage;
+			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -207,9 +207,9 @@ class OverrideService {
 
 	private function getThemeL10nFolder(): string {
 		if (in_array($this->appId, ['core', 'lib'])) {
-			return $this->themeFolder . '/' . $this->appId . '/l10n_override/';
+			return $this->themeFolder . '/' . $this->appId . '/l10n/';
 		}
-		return $this->themeFolder . '/apps/' . $this->appId . '/l10n_override/';
+		return $this->themeFolder . '/apps/' . $this->appId . '/l10n/';
 	}
 
 	private function parseOriginalText(string $originalText): self {
