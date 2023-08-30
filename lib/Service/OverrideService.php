@@ -20,6 +20,7 @@ class OverrideService {
 	/** @var Text[] */
 	private array $toOverride = [];
 	private array $translations = [];
+	private string $newLanguage;
 
 	public function __construct(
 		private IAppManager $appManager,
@@ -31,10 +32,11 @@ class OverrideService {
 	}
 
 	public function add(string $theme, string $appId, string $originalText, string $newText, string $newLanguage): void {
-		$this->text = new Text();
-		$this->parseTheme($theme)
+		$this->newLanguage = $newLanguage;
+		$this->setNewLanguage($newLanguage)
+			->parseTheme($theme)
 			->parseAppId($appId)
-			->parseNewLanguage($newLanguage)
+			->parseNewLanguage()
 			->parseOriginalText($originalText);
 		$this->text->setNewText($newText);
 		$this->text->setNotFound(0);
@@ -51,10 +53,10 @@ class OverrideService {
 	}
 
 	public function delete(string $theme, string $appId, string $originalText, string $newLanguage): void {
-		$this->text = new Text();
-		$this->parseTheme($theme)
+		$this->setNewLanguage($newLanguage)
+			->parseTheme($theme)
 			->parseAppId($appId)
-			->parseNewLanguage($newLanguage)
+			->parseNewLanguage()
 			->parseOriginalText($originalText);
 		$this->textMapper->delete($this->text);
 		$this->updateFiles();
@@ -79,10 +81,11 @@ class OverrideService {
 
 	private function update(string $appId, string $newLanguage): void {
 		try {
+			$this->newLanguage = $newLanguage;
 			$this->parseAppId($appId)
-				->parseNewLanguage($newLanguage);
+				->parseNewLanguage();
 		} catch (NotFoundException $e) {
-			$this->notifyNotFoundAllTexts($appId, $newLanguage);
+			$this->notifyNotFoundAllTexts($appId);
 		}
 		$this->updateFiles();
 	}
@@ -153,7 +156,7 @@ class OverrideService {
 		$this->toOverride = $this->textMapper->getRelatedTranslations($this->text);
 		foreach ($this->toOverride as $key => $text) {
 			$originalText = $text->getOriginalText();
-			if (empty($this->translations['translations'][$originalText])) {
+			if (empty($this->translations['translations'][$originalText]) && $this->newLanguage !== 'en') {
 				$this->notifyNotFoundText($text);
 				unset($this->toOverride[$key]);
 				continue;
@@ -167,8 +170,8 @@ class OverrideService {
 		$this->textMapper->insertOrUpdate($textNotFound);
 	}
 
-	private function notifyNotFoundAllTexts(string $appId, string $newLanguage): void {
-		$this->textMapper->flagAllAsDeleted($this->text->getTheme(), $appId, $newLanguage);
+	private function notifyNotFoundAllTexts(string $appId): void {
+		$this->textMapper->flagAllAsDeleted($this->text->getTheme(), $appId, $this->newLanguage);
 	}
 
 	private function parseTheme(?string $theme = null): self {
@@ -199,11 +202,15 @@ class OverrideService {
 		return $this;
 	}
 
-	private function parseNewLanguage(string $newLanguage): self {
+	private function parseNewLanguage(): self {
+		if ($this->newLanguage === 'en') {
+			$this->translations = ['translations' => []];
+			return $this;
+		}
 		if ($this->appManager->isInstalled($this->appId)) {
-			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $newLanguage;
+			$rootL10nPath = $this->appManager->getAppPath($this->appId) . '/l10n/' . $this->newLanguage;
 		} else {
-			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $newLanguage;
+			$rootL10nPath = $this->serverRoot . '/' . $this->appId . '/l10n/' . $this->newLanguage;
 		}
 		if (!file_exists($rootL10nPath . '.js')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.js'));
@@ -211,7 +218,6 @@ class OverrideService {
 		if (!file_exists($rootL10nPath . '.json')) {
 			throw new NotFoundException(sprintf('Translation file not found: %s', $rootL10nPath . '.json'));
 		}
-		$this->text->setNewLanguage($newLanguage);
 
 		$jsonContent = file_get_contents($rootL10nPath . '.json');
 		$this->translations = json_decode($jsonContent, true);
@@ -227,7 +233,7 @@ class OverrideService {
 	}
 
 	private function parseOriginalText(string $originalText): self {
-		if (!isset($this->translations['translations'][$originalText])) {
+		if (!isset($this->translations['translations'][$originalText]) && $this->newLanguage !== 'en') {
 			throw new InvalidArgumentException(sprintf(
 				"Text not found in translations file of app %s:\n%s",
 				$this->appId,
@@ -235,6 +241,13 @@ class OverrideService {
 			));
 		}
 		$this->text->setOriginalText($originalText);
+		return $this;
+	}
+
+	private function setNewLanguage(string $newLanguage): self {
+		$this->newLanguage = $newLanguage;
+		$this->text = new Text();
+		$this->text->setNewLanguage($this->newLanguage);
 		return $this;
 	}
 }
