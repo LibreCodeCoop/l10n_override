@@ -13,6 +13,10 @@ Types of changes:
 - *Security* in case of vulnerabilities. 
 
 <!-- changelog-linker -->
+## 0.1.0.dev - 2023-08-30
+### Changed
+- Make possible change from English to English
+
 ## 0.0.1 - 2023-08-30
 
 ### Changed
