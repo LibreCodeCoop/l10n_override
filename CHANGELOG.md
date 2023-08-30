@@ -13,6 +13,11 @@ Types of changes:
 - *Security* in case of vulnerabilities. 
 
 <!-- changelog-linker -->
+## 1.0.1 - 2023-08-30
+
+### Changed
+- stable 27
+
 ## 0.0.1 - 2023-08-30
 
 ### Changed

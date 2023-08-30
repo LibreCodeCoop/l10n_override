@@ -17,7 +17,7 @@ occ l10n-override:delete
 
 	]]>
 	</description>
-	<version>0.0.1</version>
+	<version>1.0.1</version>
 	<licence>agpl</licence>
 	<author mail="contact@librecode.coop" homepage="https://librecode.coop">LibreCode</author>
 	<namespace>L10nOverride</namespace>
