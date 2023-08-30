@@ -13,7 +13,7 @@ Types of changes:
 - *Security* in case of vulnerabilities. 
 
 <!-- changelog-linker -->
-## 2.0.1.dev - 2023-08-30
+## 2.1.0.dev - 2023-08-30
 
 ### Changed
 - first changelog compatible with server 28
