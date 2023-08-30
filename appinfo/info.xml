@@ -13,6 +13,10 @@ occ l10n-override:list
 occ l10n-override:delete
 ```
 
+With this app maybe will be possible change all texts on your Nextcloud. By example changing the "Account name or email" at login screen to "Your code".
+
+To more informations about how this app works or to get examples, look at the admin documentation.
+
 💡 Do you have an app idea? Want customizations to an existing app? Contact our sales team: contact@librecode.coop
 
 	]]>
