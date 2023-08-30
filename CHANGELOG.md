@@ -13,6 +13,12 @@ Types of changes:
 - *Security* in case of vulnerabilities. 
 
 <!-- changelog-linker -->
+## 0.0.1 - 2023-08-30
+
+### Changed
+
+- Updated the app description to include the list command.
+
 ## 0.0.1-rc.1 - 2023-08-29
 
 ### Added
