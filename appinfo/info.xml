@@ -35,7 +35,7 @@ To more informations about how this app works or to get examples, look at the ad
 	<bugs>https://github.com/librecodecoop/l10n_override/issues</bugs>
 	<repository type="git">https://github.com/librecodecoop/l10n_override</repository>
 	<dependencies>
-		<nextcloud min-version="28" max-version="28"/>
+		<nextcloud min-version="29" max-version="29"/>
 	</dependencies>
 	<commands>
 		<command>OCA\L10nOverride\Command\Add</command>
