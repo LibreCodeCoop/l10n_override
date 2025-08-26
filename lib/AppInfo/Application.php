@@ -26,14 +26,14 @@ declare(strict_types=1);
 
 namespace OCA\L10nOverride\AppInfo;
 
+use OCA\L10nOverride\Listener\AppEnabledDisabledListener;
 use OCP\App\Events\AppDisableEvent;
 use OCP\App\Events\AppEnableEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
-use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
-use OCA\L10nOverride\Listener\AppEnabledDisabledListener;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 /**
  * @codeCoverageIgnore
@@ -45,7 +45,8 @@ class Application extends App implements IBootstrap {
 		parent::__construct(self::APP_ID);
 	}
 
-	public function boot(IBootContext $context): void {}
+	public function boot(IBootContext $context): void {
+	}
 
 	public function register(IRegistrationContext $context): void {
 		$context->registerEventListener(AppEnableEvent::class, AppEnabledDisabledListener::class);
