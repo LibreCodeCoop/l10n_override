@@ -75,7 +75,7 @@ class OverrideService {
 			appId: $appId,
 		);
 		foreach ($languages as $language) {
-			$this->update($appId, $language);
+			$this->update($appId, $language["new_language"]);
 		}
 	}
 
@@ -181,7 +181,7 @@ class OverrideService {
 				return $this;
 			}
 		}
-		$theme = escapeshellcmd($theme);
+
 		if (!file_exists($this->serverRoot . '/themes/' . $theme)) {
 			mkdir($this->serverRoot . '/themes/' . $theme);
 		}
