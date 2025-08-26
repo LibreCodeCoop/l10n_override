@@ -26,13 +26,13 @@ declare(strict_types=1);
 
 namespace OCA\L10nOverride\AppInfo;
 
-use OC;
-use OCA\L10nOverride\Service\OverrideService;
+use OCA\L10nOverride\Listener\AppEnabledDisabledListener;
 use OCP\App\Events\AppDisableEvent;
 use OCP\App\Events\AppEnableEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
+
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 
 /**
@@ -46,23 +46,10 @@ class Application extends App implements IBootstrap {
 	}
 
 	public function boot(IBootContext $context): void {
-		$event = OC::$server->getEventDispatcher();
-		$event->addListener(AppEnableEvent::class, [$this, 'onAppEnabled']);
-		$event->addListener(AppDisableEvent::class, [$this, 'onAppDisabled']);
 	}
 
 	public function register(IRegistrationContext $context): void {
-	}
-
-	public function onAppEnabled(AppEnableEvent $event): void {
-		/** @var OverrideService */
-		$overrideService = OC::$server->get(OverrideService::class);
-		$overrideService->updateAllLanguages($event->getAppId());
-	}
-
-	public function onAppDisabled(AppDisableEvent $event): void {
-		/** @var OverrideService */
-		$overrideService = OC::$server->get(OverrideService::class);
-		$overrideService->deleteAllLanguages($event->getAppId());
+		$context->registerEventListener(AppEnableEvent::class, AppEnabledDisabledListener::class);
+		$context->registerEventListener(AppDisableEvent::class, AppEnabledDisabledListener::class);
 	}
 }
