@@ -75,7 +75,7 @@ class OverrideService {
 			appId: $appId,
 		);
 		foreach ($languages as $language) {
-			$this->update($this->text->getTheme(), $appId, $language);
+			$this->update($appId, $language["new_language"]);
 		}
 	}
 
@@ -103,15 +103,16 @@ class OverrideService {
 	private function removeFiles(): void {
 		$extensions = ['js', 'json'];
 		foreach ($extensions as $extension) {
-			if (file_exists($this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $extension)) {
-				$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $extension;
-				exec('rm -rf ' . escapeshellarg($file));
+			$file = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $extension;
+			if (is_file($file)) {
+				unlink($file);
 			}
 		}
+
 		$dir = $this->getThemeL10nFolder();
 		// Remove empty folders
-		while (!(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
-			exec('rm -rf ' . escapeshellarg($dir));
+		while (is_dir($dir) && !(new \FilesystemIterator($dir))->valid() && $dir !== $this->serverRoot . '/themes') {
+			rmdir($dir);
 			$dir = dirname($dir);
 		}
 	}
@@ -146,7 +147,7 @@ class OverrideService {
 
 	private function write(string $format, string $content): void {
 		if (!is_dir($this->getThemeL10nFolder())) {
-			exec('mkdir -p ' . escapeshellarg($this->getThemeL10nFolder()));
+			mkdir($this->getThemeL10nFolder(), 0755, true);
 		}
 		$fileName = $this->getThemeL10nFolder() . $this->text->getNewLanguage() . '.' . $format;
 		file_put_contents($fileName, $content);
@@ -180,7 +181,7 @@ class OverrideService {
 				return $this;
 			}
 		}
-		$theme = escapeshellcmd($theme);
+
 		if (!file_exists($this->serverRoot . '/themes/' . $theme)) {
 			mkdir($this->serverRoot . '/themes/' . $theme);
 		}
